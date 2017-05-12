@@ -50,9 +50,9 @@ function Graph(msg,ac,sampleBank,compressor, cutGroups){
 	this.cut(msg.cut, msg.sample_name);
 	// Distortion
 	last = this.shape(last, msg.shape);
-	//Lowpass filtering @what level/function to set frequency and resonant gain at?
+	//Lowpass filtering 
 	last = this.lowPassFilter(last, msg.cutoff, msg.resonance);
-	//higpass filtering @what level/function to set frequency and resonant gain at?
+	//higpass filtering 
 	last = this.highPassFilter(last, msg.hcutoff, msg.hresonance)
 	//Band Pass Filtering @where to set frequency ranges?
 	last = this.bandPassFilter(last, msg.bandf, msg.bandq)
@@ -133,12 +133,13 @@ Graph.prototype.disconnectHandler = function() {
 
 Graph.prototype.bandPassFilter=function(input, bandf, bandq){
 	//Bandpass Filter
-	if(bandf>0 && bandf<1 && bandq>0){
+	if(bandf>0){
 			filterNode = this.ac.createBiquadFilter();
 			filterNode.type = 'bandpass';
 			filterNode.frequency.value = bandf;
+			if (bandq==undefined){bandq=1}
+			else {bandq = Math.min(Math.max(bandq,0),1)*30}
 			filterNode.Q.value = bandq;
-
 			input.connect(filterNode);
 			return filterNode;
 	}
@@ -266,24 +267,18 @@ Graph.prototype.delay= function(input,outputGain,delayTime,delayFeedback) {
 
 Graph.prototype.highPassFilter = function (input, hcutoff, hresonance){
 
-	if(hresonance>0 && hresonance<1 && hcutoff>0){
+	if(hcutoff>0){
 			//Filtering
-			filterNode = this.ac.createBiquadFilter();
+			var filterNode = this.ac.createBiquadFilter();
 			filterNode.type = 'highpass';
 			filterNode.frequency.value = hcutoff;
-			filterNode.Q.value = 0.1;
+	
+			if (hresonance==undefined){hresonance=1}
+			else {hresonance = Math.min(Math.max(0,hresonance),1)*30}
+			filterNode.Q.value = hresonance;
 			input.connect(filterNode);
 			input = filterNode;
 
-			//Resonance@
-			filterNode = this.ac.createBiquadFilter();
-			filterNode.type = 'peaking';
-			filterNode.frequency.value = hcutoff;
-			filterNode.Q.value=70;
-			filterNode.gain.value = hresonance*10;
-			input.connect(filterNode);
-
-			input.connect(filterNode);
 			return filterNode;
 	}
 	else return input;
@@ -311,22 +306,17 @@ Graph.prototype.loop = function(input, loopCount){
 
 Graph.prototype.lowPassFilter = function(input, cutoff, resonance){
 
-	if(cutoff>0 && resonance>0 && resonance<1){
+	if(cutoff>0){
 //resonance>0 && resonance<=1 &&
 			var filterNode = this.ac.createBiquadFilter();
 			filterNode.type = 'lowpass';
 			filterNode.frequency.value = cutoff;
+			if(resonance==undefined){resonance=1}
+			else {resonance=Math.max(0,Math.min(resonance,1))*30}
 			filterNode.Q.value = resonance
 
 			input.connect(filterNode);
 			input = filterNode;
-
-			// filterNode = this.ac.createBiquadFilter();
-			// filterNode.type = 'peaking';
-			// filterNode.frequency.value = cutoff*14000;
-			// filterNode.Q.value=resonance;
-			// filterNode.gain.value = resonance*15;
-			// input.connect(filterNode);
 			return filterNode;
 	}
 	else return input
@@ -404,11 +394,13 @@ Graph.prototype.negativeAccelerateBuffer = function(buffer, accelerateValue, spe
 Graph.prototype.accel = function(buffer, accelerateValue, speed){
 	if(isNaN(parseFloat(accelerateValue))) return buffer;
 	accelerateValue = parseFloat(accelerateValue);
+	if (accelerateValue==0){return buffer}
+	
 	//if buffer data isn't loaded yet, affect isn't applied
 	try{var frames = buffer.length;}
 	catch(e){
 		console.log("Warning, buffer data not loaded, accelerate effect not applied");
-		return
+		return buffer
 	}
 
 	var pcmData = new Float32Array(frames);
