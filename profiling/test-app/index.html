@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebDirt profile</title>
+    <script id="webdirt" type="module" src="./WebDirt/WebDirt-packed.js"></script>
+    <script>
+
+        window.addEventListener('load', () => {
+            window.wd = new WebDirt.WebDirt({
+                sampleMapUrl: "samples/sampleMap.json",
+                sampleFolder: "samples/Dirt-Samples"
+            });
+            const initButton = document.getElementById('init')
+            initButton.removeAttribute('disabled');
+            initButton.addEventListener('click', () => {
+                window.wd.initializeWebAudio();
+            })
+        });
+
+
+    </script>
+</head>
+
+<body>
+    <button disabled id="init">Initialize Web Audio</button>
+</body>
+
+</html>

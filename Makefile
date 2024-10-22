@@ -5,3 +5,5 @@ webpack:
 purs:
 	spago build
 
+profile: webpack
+	cp -r dist profiling/test-app/WebDirt

@@ -2,7 +2,7 @@ WebDirt is a loose re-creation/fork of Alex McLean's Dirt sampling engine to run
 
 Here are some simple examples (note: assuming ES6 modules) of how WebDirt might be used from a JavaScript point of view:
 
-```
+```javascript
 // import webpacked library
 import * as WebDirt from './WebDirt/WebDirt-packed.js';
 
