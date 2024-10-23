@@ -53,8 +53,18 @@ export function WebDirt(args) {
         }
     }
 }
-WebDirt.prototype.wasmTest = function (args) {
-    WebDirtRs.greet(args)
+var wasmInit = false;
+WebDirt.prototype.wasmTest = function () {
+    if (!wasmInit) {
+        fetch('./WebDirt/64bcc6d997b54378d8c1.wasm')
+            .then(response => response.arrayBuffer())
+            .then(bytes => {
+                WebDirtRs.initSync(bytes);
+                wasmInit = true;
+            });
+    } else {
+        WebDirtRs.greet();  // Now the WebAssembly functions can be called
+    }
 }
 
 // note: the constructor above does not initialize the Web Audio context.
