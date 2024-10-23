@@ -6,4 +6,4 @@ purs:
 	spago build
 
 profile: webpack
-	cp -r dist profiling/test-app/WebDirt
+	cp -r dist/* profiling/test-app/WebDirt
