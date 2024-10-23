@@ -39,12 +39,10 @@ const wait = (dur) => new Promise(res => {
     };
 
     const performTrace = async (traceName, params) => {
-        await page.tracing.start({ path: `trace-${traceName}.json` });
-        for (let i = 0; i < 10; i++) {
-            await playSample(params)
-        }
+        await page.tracing.start({ path: `traces/trace-${traceName}.json` });
+        await playSample(params)
         // Some delay for the audio nodes to play (and then clean up)
-        await wait(1000);
+        await wait(2000);
         await page.tracing.stop();
     }
 
