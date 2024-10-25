@@ -227,12 +227,19 @@ Graph.prototype.disconnectHandler = function() {
 //             EFFECT FUNCTIONS:          //
 ////////////////////////////////////////////
 
+const worklets = {
+    // coarse: 'coarse-processor',
+    coarse: 'coarse-processor-wasm',
+    crush: 'crush-processor',
+    shape: 'shape-processor',
+}
+
 
 Graph.prototype.coarse = function(input, coarse){
   coarse = parseInt(coarse);
   if(isNaN(coarse)) coarse = 1;
   if(coarse > 1 && this.workletsAvailable) {
-    var coarseProcessorNode = new AudioWorkletNode(this.ac,'coarse-processor');
+    var coarseProcessorNode = new AudioWorkletNode(this.ac, worklets['coarse']);
     coarseProcessorNode.parameters.get('coarse').value = coarse;
     input.connect(coarseProcessorNode);
     this.disconnectOnEnd(coarseProcessorNode);
@@ -246,7 +253,7 @@ Graph.prototype.crush = function(input, crush){
   crush = parseInt(crush);
   if(isNaN(crush)) crush = null;
   if(crush!=null && crush>0 && this.workletsAvailable) {
-    var crushProcessorNode = new AudioWorkletNode(this.ac,'crush-processor');
+    var crushProcessorNode = new AudioWorkletNode(this.ac, worklets['crush']);
     crushProcessorNode.parameters.get('crush').value = crush;
     input.connect(crushProcessorNode);
     this.disconnectOnEnd(crushProcessorNode);
@@ -495,7 +502,7 @@ Graph.prototype.shape = function(input, shape){
   if(isNaN(shape)) shape = 0;
 	if(shape >= 1) shape = 0.999;
   if(shape>0 && this.workletsAvailable) {
-    var shapeProcessorNode = new AudioWorkletNode(this.ac,'shape-processor');
+    var shapeProcessorNode = new AudioWorkletNode(this.ac, worklets['shape']);
     shapeProcessorNode.parameters.get('shape').value = shape;
     input.connect(shapeProcessorNode);
     this.disconnectOnEnd(shapeProcessorNode);

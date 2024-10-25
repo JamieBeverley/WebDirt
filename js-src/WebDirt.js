@@ -93,7 +93,12 @@ WebDirt.prototype.initializeWebAudio = function () {
     }
     if (this.ac != null) {
         if (this.ac.audioWorklet != null) {
-            this.ac.audioWorklet.addModule('WebDirt/AudioWorklets.js').then(() => { // *** WARNING: path is not robust to different installation patterns here
+            Promise.all(
+                [
+                    "WebDirt/AudioWorklets.js",
+                    "WebDirt/AudioWorkletsWasm.js"
+                ].map(module=>this.ac.audioWorklet.addModule(module))
+            ).then(() => { // *** WARNING: path is not robust to different installation patterns here
                 console.log("WebDirt: audio worklets added");
                 this.workletsAvailable = true;
             }).catch(err => {
